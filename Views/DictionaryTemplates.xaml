@@ -4,4 +4,22 @@
     <DataTemplate x:Key="templateBtwDir">
         
     </DataTemplate>
+    <DataTemplate x:Key="templateBtwImage" DataType="string">
+        <Border BorderThickness="2" BorderBrush="LightBlue" Margin="5">
+
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+                
+            </Grid.RowDefinitions>
+                
+            <Image MaxHeight="400" MaxWidth="400" 
+               Source="{Binding ., Converter={StaticResource btwf2ic},Mode=OneTime}"/>
+            <TextBlock Grid.Row="1" Text="{Binding .,Converter={StaticResource btwdirc}, Mode=OneTime}"
+                       HorizontalAlignment="Center"/>
+        </Grid>
+        </Border>
+
+    </DataTemplate>
 </ResourceDictionary>

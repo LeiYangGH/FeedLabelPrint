@@ -61,12 +61,16 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox Grid.Column="1" ItemsSource="{Binding ObsBtwFiles}" SelectedValue="{Binding SelectedBtwFile}">
-                <ListBox.ItemTemplate>
+            <ListBox Grid.Column="1" 
+                     ItemsSource="{Binding ObsBtwFiles}" 
+                     SelectedValue="{Binding SelectedBtwFile}"
+                     ItemTemplate="{StaticResource templateBtwImage}"
+                     >
+                <!--<ListBox.ItemTemplate>
                     <DataTemplate>
                         <Image MaxHeight="400" MaxWidth="400" Source="{Binding ., Converter={StaticResource btwf2ic},Mode=OneWay}"/>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
+                </ListBox.ItemTemplate>-->
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="4"></UniformGrid>

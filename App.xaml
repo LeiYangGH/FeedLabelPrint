@@ -3,8 +3,8 @@
     <ResourceDictionary>
       <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:FeedLabelPrint.ViewModel" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Views/DictionaryTemplates.xaml" />
                 <ResourceDictionary Source="Views/DictionaryConverters.xaml" />
+                <ResourceDictionary Source="Views/DictionaryTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
   </Application.Resources>
