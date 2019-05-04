@@ -1,14 +1,16 @@
 ﻿using Seagull.BarTender.Print;
+using System;
 
 namespace FeedLabelPrint
 {
     public class BtwPrintWrapper
     {
-        public static string PrintBtwFile(string btwFile)
+
+        public static string PrintBtwFile(string btwFile, Engine btEngine)
         {
-            Engine engine = new Engine(true);
+
             Messages messages;
-            LabelFormatDocument format = engine.Documents.Open(btwFile);
+            LabelFormatDocument format = btEngine.Documents.Open(btwFile);
             int waitForCompletionTimeout = 10000; // 10 seconds
             Result result = format.Print("测试打印" + System.IO.Path.GetFileName(btwFile), waitForCompletionTimeout, out messages);
             string messageString = "\n\nMessages:";
@@ -17,7 +19,9 @@ namespace FeedLabelPrint
             {
                 messageString += "\n\n" + message.Text;
             }
+
             return messageString;
+
         }
     }
 }
