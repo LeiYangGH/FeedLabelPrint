@@ -60,7 +60,16 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <ListBox Grid.Column="1" ItemsSource="{Binding ObsBtwFiles}">
-                
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Image MaxHeight="400" MaxWidth="400" Source="{Binding ., Converter={StaticResource btwf2ic},Mode=OneWay}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4"></UniformGrid>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
             </ListBox>
         </Grid>
         <TextBox Grid.Row="5" IsReadOnly="True">提示帮助信息</TextBox>

@@ -5,4 +5,5 @@
                     
                     >
     <cvt:BtwDirNameConverter x:Key="btwdirc"/>
+    <cvt:BtwFile2ImageConverter x:Key="btwf2ic"/>
 </ResourceDictionary>
