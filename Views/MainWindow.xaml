@@ -33,7 +33,9 @@
         </Grid>
         <Grid Grid.Row="2">
             <TextBox IsReadOnly="True" Text="模板1.btw"></TextBox>
-            <Button HorizontalAlignment="Right">打印</Button>
+            <Button Command="{Binding PrintCommand}" 
+                    IsEnabled="{Binding SelectedBtwFile,Converter={StaticResource selbtwf2enablec}, Mode=OneWay}"
+                    HorizontalAlignment="Right">打印</Button>
         </Grid>
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
@@ -59,7 +61,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox Grid.Column="1" ItemsSource="{Binding ObsBtwFiles}">
+            <ListBox Grid.Column="1" ItemsSource="{Binding ObsBtwFiles}" SelectedValue="{Binding SelectedBtwFile}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Image MaxHeight="400" MaxWidth="400" Source="{Binding ., Converter={StaticResource btwf2ic},Mode=OneWay}"/>
@@ -72,6 +74,6 @@
                 </ListBox.ItemsPanel>
             </ListBox>
         </Grid>
-        <TextBox Grid.Row="5" IsReadOnly="True">提示帮助信息</TextBox>
+        <TextBox Grid.Row="5" MaxHeight="50" IsReadOnly="True" Text="{Binding Message,Mode=OneWay}" />
     </Grid>
 </Window>

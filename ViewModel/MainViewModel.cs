@@ -1,6 +1,8 @@
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FeedLabelPrint.ViewModel
 {
@@ -44,7 +46,7 @@ namespace FeedLabelPrint.ViewModel
         {
             string[] dirs = Directory.GetDirectories(Constants.btwTopDir);
             this.ObsBtwDirs = new ObservableCollection<string>(dirs);
-            
+
         }
 
         private void ListBtwFilesInDir(string dir)
@@ -105,6 +107,81 @@ namespace FeedLabelPrint.ViewModel
                     this.RaisePropertyChanged(nameof(ObsBtwFiles));
                 }
             }
+        }
+
+
+        private string selectedBtwFile;
+        public string SelectedBtwFile
+        {
+            get
+            {
+                return this.selectedBtwFile;
+            }
+            set
+            {
+                if (this.selectedBtwFile != value)
+                {
+                    this.selectedBtwFile = value;
+                    this.RaisePropertyChanged(nameof(SelectedBtwFile));
+                }
+            }
+        }
+
+
+
+        private string message;
+        public string Message
+        {
+            get
+            {
+                return this.message;
+            }
+            set
+            {
+                if (this.message != value)
+                {
+                    this.message = value;
+                    this.RaisePropertyChanged(nameof(Message));
+                }
+            }
+        }
+
+
+        private bool isPrinting;
+        private RelayCommand printCommand;
+
+        public RelayCommand PrintCommand
+        {
+            get
+            {
+                return printCommand
+                  ?? (printCommand = new RelayCommand(
+                    async () =>
+                    {
+                        if (isPrinting)
+                        {
+                            return;
+                        }
+
+                        isPrinting = true;
+                        PrintCommand.RaiseCanExecuteChanged();
+
+                        await Print();
+
+                        isPrinting = false;
+                        PrintCommand.RaiseCanExecuteChanged();
+                    },
+                    () => !isPrinting));
+            }
+        }
+        private async Task Print()
+        {
+            await Task.Run(() =>
+            {
+                string msg = BtwPrintWrapper.PrintBtwFile(this.SelectedBtwFile);
+                this.Message = msg.Trim();
+            });
+
         }
 
     }

@@ -77,9 +77,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BtwPrintWrapper.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\BtwDirNameConverter.cs" />
     <Compile Include="Converters\BtwFile2ImageConverter.cs" />
+    <Compile Include="Converters\SelectedBtw2PrintEnableConverter.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
