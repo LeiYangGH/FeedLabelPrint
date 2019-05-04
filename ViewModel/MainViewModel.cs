@@ -51,7 +51,7 @@ namespace FeedLabelPrint.ViewModel
 
         private void ListBtwFilesInDir(string dir)
         {
-            string[] files = Directory.GetFiles(dir);
+            string[] files = Directory.GetFiles(dir, "*.btw");
             this.ObsBtwFiles = new ObservableCollection<string>(files);
 
         }
