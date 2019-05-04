@@ -1,5 +1,6 @@
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace FeedLabelPrint.ViewModel
 {
@@ -27,9 +28,9 @@ namespace FeedLabelPrint.ViewModel
             }
             else
             {
-                this.CreateSampleData();
+                //this.CreateSampleData();
 
-                // Code runs "for real"
+                this.ListBtwDirs();
             }
         }
 
@@ -37,6 +38,20 @@ namespace FeedLabelPrint.ViewModel
         {
             this.ObsBtwDirs = new ObservableCollection<string>() { "º¶À«¡œ", "”„À«¡œ", "÷ÌÀ«¡œ" };
             this.ObsBtwFiles = new ObservableCollection<string>() { "111", "222", "333", "444", "555", "666", "777", "888", "999" };
+        }
+
+        private void ListBtwDirs()
+        {
+            string[] dirs = Directory.GetDirectories(Constants.btwTopDir);
+            this.ObsBtwDirs = new ObservableCollection<string>(dirs);
+            
+        }
+
+        private void ListBtwFilesInDir(string dir)
+        {
+            string[] files = Directory.GetFiles(dir);
+            this.ObsBtwFiles = new ObservableCollection<string>(files);
+
         }
 
         private ObservableCollection<string> obsBtwDirs;
@@ -52,6 +67,25 @@ namespace FeedLabelPrint.ViewModel
                 {
                     this.obsBtwDirs = value;
                     this.RaisePropertyChanged(nameof(ObsBtwDirs));
+                }
+            }
+        }
+
+
+        private string selectedBtwDir;
+        public string SelectedBtwDir
+        {
+            get
+            {
+                return this.selectedBtwDir;
+            }
+            set
+            {
+                if (this.selectedBtwDir != value)
+                {
+                    this.selectedBtwDir = value;
+                    this.ListBtwFilesInDir(value);
+                    this.RaisePropertyChanged(nameof(SelectedBtwDir));
                 }
             }
         }
