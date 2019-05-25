@@ -70,7 +70,10 @@ namespace FeedLabelPrint.Model
                     cmd.Parameters.AddWithValue("@labelname", labelname);
                     conn.Open();
                     object re = cmd.ExecuteScalar();
-                    return Convert.ToInt32(re);
+                    if (re is DBNull)
+                        return 0;
+                    else
+                        return Convert.ToInt32(re);
                 }
             }
             catch (Exception ex)
@@ -92,7 +95,10 @@ namespace FeedLabelPrint.Model
                     cmd.CommandText = sql;
                     conn.Open();
                     object re = cmd.ExecuteScalar();
-                    return Convert.ToInt32(re);
+                    if (re is DBNull)
+                        return 0;
+                    else
+                        return Convert.ToInt32(re);
                 }
             }
             catch (Exception ex)

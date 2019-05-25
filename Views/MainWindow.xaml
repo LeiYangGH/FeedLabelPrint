@@ -87,12 +87,12 @@
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Image MaxWidth="100" MaxHeight="100">
+                                <Image MaxWidth="100" MaxHeight="100" >
                                     <Image.Source>
                                         <BitmapImage UriSource="/Images/folder-flower-green-icon.png" />
                                     </Image.Source>
                                 </Image>
-                                <TextBlock Text="{Binding ., Converter={StaticResource btwdirc},Mode=OneWay}" 
+                                <TextBlock Text="{Binding ., Converter={StaticResource btwdirc},Mode=OneWay, IsAsync=True}" 
                                            VerticalAlignment="Center"
                                            Grid.Column="1"/>
 

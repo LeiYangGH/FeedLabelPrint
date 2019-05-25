@@ -156,7 +156,8 @@ namespace FeedLabelPrint.ViewModel
                     this.selectedBtwVM = value;
                     this.RaisePropertyChanged(nameof(SelectedBtwVM));
                     this.UpdatePrintedCount();
-                    this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwVM.FullName))}";
+                    if (this.SelectedBtwVM != null)
+                        this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwVM.FullName))}";
 
                 }
             }
@@ -392,7 +393,7 @@ namespace FeedLabelPrint.ViewModel
 
         private void UpdatePrintedCount()
         {
-            if (LabelOperator.isObjectExistingFile(this.SelectedBtwVM.FullName))
+            if (this.SelectedBtwVM != null && LabelOperator.isObjectExistingFile(this.SelectedBtwVM.FullName))
                 this.PrintedCountOfCurrent = SqliteHistory.QueryTotalByLabel(this.SelectedBtwVM.FullName.Replace(
                         Constants.btwTopDir, ""));
             this.PrintedCountOfAll = SqliteHistory.QueryTotalAll();
@@ -409,14 +410,14 @@ namespace FeedLabelPrint.ViewModel
                     Log.Instance.Logger.Error($"未选择任何文件，退出打印!");
                     return;
                 }
-                if (LabelOperator.isObjectExistingFile(this.SelectedBtwVM))
+                if (LabelOperator.isObjectExistingFile(this.SelectedBtwVM.FullName))
                 {
                     if (this.BtEngine == null)
                     {
                         Log.Instance.Logger.Error($"bartender未正确初始化，无法打印!");
                         return;
                     }
-                    Log.Instance.Logger.Info($"准备打印{this.SelectedBtwVM}!");
+                    Log.Instance.Logger.Info($"准备打印{this.SelectedBtwVM.FullName}!");
 
                     LabelFormatDocument label =
                     this.SetLabelValues(this.SelectedBtwVM.FullName);
@@ -439,7 +440,7 @@ namespace FeedLabelPrint.ViewModel
                 }
                 else
                 {
-                    Log.Instance.Logger.Error($"无法打印，文件不存在：{this.SelectedBtwVM}!");
+                    Log.Instance.Logger.Error($"无法打印，文件不存在：{this.SelectedBtwVM.FullName}!");
                 }
             });
         }
