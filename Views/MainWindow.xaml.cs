@@ -27,7 +27,7 @@ namespace FeedLabelPrint.Views
             this.mainVM = this.DataContext as MainViewModel;
             mainWin = this;
             this.ShowVersion();
-            Log.Instance.Logger.Debug("\r\end of MainWindow()!");
+            Log.Instance.Logger.Debug("\r\nend of MainWindow()!");
         }
 
         private void ShowVersion()
