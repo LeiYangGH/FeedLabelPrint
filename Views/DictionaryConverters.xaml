@@ -7,5 +7,5 @@
     <cvt:BtwDirNameConverter x:Key="btwdirc"/>
     <cvt:BtwFile2ImageConverter x:Key="btwf2ic"/>
     <cvt:SelectedBtw2PrintEnableConverter x:Key="selbtwf2enablec"/>
-    
+    <cvt:SelectedBtw2FileNameOExtConverter x:Key="selbtwf2fnoextc"/>
 </ResourceDictionary>

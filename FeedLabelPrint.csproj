@@ -81,7 +81,10 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Converters\BtwDirNameConverter.cs" />
     <Compile Include="Converters\BtwFile2ImageConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Converters\SelectedBtw2FileNameOExtConverter.cs" />
     <Compile Include="Converters\SelectedBtw2PrintEnableConverter.cs" />
+    <Compile Include="LabelOperator.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -140,6 +143,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Resource Include="Images\bartend.ico" />
+    <Resource Include="Images\folder-flower-green-icon.png" />
     <Content Include="RefDlls\BarTenderPrintClient.dll" />
     <Content Include="RefDlls\Seagull.BarTender.Print.dll" />
   </ItemGroup>

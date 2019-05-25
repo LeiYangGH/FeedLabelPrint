@@ -5,39 +5,134 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FeedLabelPrint.Views"
         mc:Ignorable="d"
-        Title="饲料标签打印系统" Height="600" Width="800"
+        Title="标签速打系统" Height="600" Width="800"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
-        FontSize="20">
+        FontSize="20"
+        WindowState="Maximized" WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing" 
+        >
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock>功能选择</TextBlock>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0">生产日期</TextBlock>
-            <TextBlock Grid.Column="1">生产批号</TextBlock>
-            <TextBlock Grid.Column="2">打印数量</TextBlock>
-            <TextBlock Grid.Column="3">起始包号</TextBlock>
-        </Grid>
-        <Grid Grid.Row="2">
-            <TextBox IsReadOnly="True" Text="模板1.btw"></TextBox>
-            <Button Command="{Binding PrintCommand}" 
+
+        <GroupBox Grid.Row="0" Header="打印参数">
+            <Grid  >
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" HorizontalAlignment="Right"
+                          >打印生产日期</CheckBox>
+                <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">生产批号</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">打印数量</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">起始包号</TextBlock>
+
+                <DatePicker Grid.Row="0" Grid.Column="1" MaxWidth="200" HorizontalAlignment="Center" HorizontalContentAlignment="Left"
+                        IsEnabled="{Binding LabelHasDate,Mode=OneWay}"
+                        SelectedDate="{Binding SelectedDate,UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,2"
+                        ></DatePicker>
+
+                <TextBox Grid.Row="0" Grid.Column="3" Margin="0,2"
+                     MaxWidth="200" HorizontalContentAlignment="Left"
+                     Text="{Binding BatchNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBox Grid.Row="1" Grid.Column="1"  MaxLength="3" Margin="0,2"
+                     MaxWidth="200" HorizontalContentAlignment="Left"
+                     Text="{Binding PrintPages, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                <TextBox Grid.Row="1" Grid.Column="3"  MaxLength="7" Margin="0,2"
+                     MaxWidth="200" HorizontalContentAlignment="Left"
+                     Text="{Binding StartingNumber, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button Command="{Binding PrintCommand}" Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" MinWidth="100"
                     IsEnabled="{Binding SelectedBtwFile,Converter={StaticResource selbtwf2enablec}, Mode=OneWay}"
-                    HorizontalAlignment="Right">打印</Button>
-        </Grid>
-        <Grid Grid.Row="3">
+                    HorizontalAlignment="Center">打印</Button>
+
+            </Grid>
+        </GroupBox>
+
+
+        <Border Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" Padding="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" ></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="2*" ></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ListBox  
+                ItemsSource="{Binding ObsBtwDirs, Mode=OneWay}" 
+                     SelectedValue="{Binding SelectedBtwDir}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Image MaxWidth="100" MaxHeight="100">
+                                    <Image.Source>
+                                        <BitmapImage UriSource="/Images/folder-flower-green-icon.png" />
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Text="{Binding ., Converter={StaticResource btwdirc},Mode=OneWay}" 
+                                           VerticalAlignment="Center"
+                                           Grid.Column="1"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch"  HorizontalAlignment="Center" ResizeDirection="Columns"/>
+                <ListBox  Grid.Column="2"
+                ItemsSource="{Binding ObsBtwFiles, Mode=OneWay}" 
+                     SelectedValue="{Binding SelectedBtwFile}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Image MaxWidth="50" MaxHeight="50" Margin="5,2">
+                                    <Image.Source>
+                                        <BitmapImage UriSource="/Images/bartend.ico" />
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Text="{Binding ., Converter={StaticResource selbtwf2fnoextc},Mode=OneWay}" 
+                                           VerticalAlignment="Center"
+                                           Grid.Column="1"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <GridSplitter Grid.Column="3" VerticalAlignment="Stretch"  HorizontalAlignment="Center"
+                          Width="4" Background="LightGray" ResizeDirection="Columns"/>
+
+                <Image    Grid.Column="4"
+               Source="{Binding SelectedBtwFile, Converter={StaticResource btwf2ic},Mode=OneWay}"
+                      />
+
+            </Grid>
+        </Border>
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
@@ -49,35 +144,7 @@
             <TextBlock Grid.Column="2">总长度：876米</TextBlock>
             <TextBlock Grid.Column="3">打印机合计打印长度：8761米</TextBlock>
         </Grid>
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <ListBox ItemsSource="{Binding ObsBtwDirs, Mode=OneWay}" SelectedValue="{Binding SelectedBtwDir}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding ., Converter={StaticResource btwdirc},Mode=OneWay}"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <ListBox Grid.Column="1" 
-                     ItemsSource="{Binding ObsBtwFiles}" 
-                     SelectedValue="{Binding SelectedBtwFile}"
-                     ItemTemplate="{StaticResource templateBtwImage}"
-                     >
-                <!--<ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Image MaxHeight="400" MaxWidth="400" Source="{Binding ., Converter={StaticResource btwf2ic},Mode=OneWay}"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>-->
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="4"></UniformGrid>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-            </ListBox>
-        </Grid>
-        <TextBox Grid.Row="5" MaxHeight="50" IsReadOnly="True" Text="{Binding Message,Mode=OneWay}" />
+
+        <TextBox Grid.Row="3" MaxHeight="50" IsReadOnly="True" Text="{Binding Message,Mode=OneWay}" />
     </Grid>
 </Window>

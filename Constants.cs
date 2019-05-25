@@ -11,9 +11,8 @@ namespace FeedLabelPrint
     public static class Constants
     {
 
-        //public static readonly string curDir = Environment.CurrentDirectory;
-        public static readonly string curDir = @"C:\";
-        public static readonly string btwTopDir = Path.Combine(curDir, "打印模板");
+        public const string FeedLabelPrint = "FeedLabelPrint";
+        public static readonly string btwTopDir = @"C:\打印模板";
 
 
     }

@@ -23,6 +23,7 @@ namespace FeedLabelPrint.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private Engine m_engine = null;
+        private LabelOperator labelOperator;
 
 
         private Engine BtEngine
@@ -38,6 +39,7 @@ namespace FeedLabelPrint.ViewModel
         }
 
 
+
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -50,8 +52,22 @@ namespace FeedLabelPrint.ViewModel
             {
                 //this.CreateSampleData();
 
-                this.ListBtwDirs();
+                Task.Run(() => this.InitComponents());
+
             }
+        }
+
+        private void InitComponents()
+        {
+            if (!Directory.Exists(Constants.btwTopDir))
+                Directory.CreateDirectory(Constants.btwTopDir);
+            this.ListBtwDirs();
+
+            //this.SelectedDate = DateTime.Today;
+
+            //SqliteHistory.CreateDb();
+            this.labelOperator = new LabelOperator(this.BtEngine);
+
         }
 
         private void CreateSampleData()
@@ -141,11 +157,47 @@ namespace FeedLabelPrint.ViewModel
                 {
                     this.selectedBtwFile = value;
                     this.RaisePropertyChanged(nameof(SelectedBtwFile));
+                    this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwFile))}";
+
                 }
             }
         }
 
 
+        private string batchNumber;
+        public string BatchNumber
+        {
+            get
+            {
+                return this.batchNumber;
+            }
+            set
+            {
+                if (this.batchNumber != value)
+                {
+                    this.batchNumber = value;
+                    this.RaisePropertyChanged(nameof(BatchNumber));
+                }
+            }
+        }
+
+
+        private int printPages;
+        public int PrintPages
+        {
+            get
+            {
+                return this.printPages;
+            }
+            set
+            {
+                if (this.printPages != value)
+                {
+                    this.printPages = value;
+                    this.RaisePropertyChanged(nameof(PrintPages));
+                }
+            }
+        }
 
         private string message;
         public string Message
@@ -213,8 +265,10 @@ namespace FeedLabelPrint.ViewModel
                 {
                     // TODO: 释放托管状态(托管对象)。
                     if (this.m_engine != null)
-                        this.m_engine.Stop();
-                    this.m_engine.Dispose();
+                    {
+                        this.m_engine.Stop(Seagull.BarTender.Print.SaveOptions.DoNotSaveChanges);
+                        this.m_engine.Dispose();
+                    }
                 }
 
                 // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
