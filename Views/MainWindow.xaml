@@ -146,10 +146,10 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0">当前模板打印张数:</TextBlock>
-            <TextBlock Grid.Column="1" Text="{Binding PrintedCountOfCurrent,Mode=OneWay}"/>
-            <TextBlock Grid.Column="2">全部模板打印张数:</TextBlock>
-            <TextBlock Grid.Column="3" Text="{Binding PrintedCountOfAll,Mode=OneWay}"/>
+            <TextBlock Grid.Column="0" HorizontalAlignment="Right">当前模板打印张数:</TextBlock>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Left" Text="{Binding PrintedCountOfCurrent,Mode=OneWay}" Margin="5,1"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Right">全部模板打印张数:</TextBlock>
+            <TextBlock Grid.Column="3" HorizontalAlignment="Left" Text="{Binding PrintedCountOfAll,Mode=OneWay}" Margin="5,1"/>
         </Grid>
 
         <TextBox Grid.Row="3" MaxHeight="50" IsReadOnly="True" Text="{Binding Message,Mode=OneWay}" />
