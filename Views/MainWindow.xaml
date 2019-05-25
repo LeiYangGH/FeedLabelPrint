@@ -35,13 +35,14 @@
                 </Grid.ColumnDefinitions>
 
                 <CheckBox Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" HorizontalAlignment="Right"
+                          IsChecked="{Binding NeedDate,UpdateSourceTrigger=PropertyChanged}"
                           >打印生产日期</CheckBox>
                 <TextBlock Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">生产批号</TextBlock>
                 <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">打印数量</TextBlock>
                 <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right">起始包号</TextBlock>
 
                 <DatePicker Grid.Row="0" Grid.Column="1" MaxWidth="200" HorizontalAlignment="Center" HorizontalContentAlignment="Left"
-                        IsEnabled="{Binding LabelHasDate,Mode=OneWay}"
+                        IsEnabled="{Binding NeedDate,Mode=OneWay}"
                         SelectedDate="{Binding SelectedDate,UpdateSourceTrigger=PropertyChanged}"
                             Margin="0,2"
                         ></DatePicker>
@@ -139,10 +140,10 @@
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0">统计</TextBlock>
-            <TextBlock Grid.Column="1">模板1打印总数量：11111张</TextBlock>
-            <TextBlock Grid.Column="2">总长度：876米</TextBlock>
-            <TextBlock Grid.Column="3">打印机合计打印长度：8761米</TextBlock>
+            <TextBlock Grid.Column="0">当前模板打印张数:</TextBlock>
+            <TextBlock Grid.Column="1" Text="{Binding PrintedCountOfCurrent,Mode=OneWay}"/>
+            <TextBlock Grid.Column="2">全部模板打印张数:</TextBlock>
+            <TextBlock Grid.Column="3" Text="{Binding PrintedCountOfAll,Mode=OneWay}"/>
         </Grid>
 
         <TextBox Grid.Row="3" MaxHeight="50" IsReadOnly="True" Text="{Binding Message,Mode=OneWay}" />

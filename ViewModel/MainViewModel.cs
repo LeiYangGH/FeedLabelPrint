@@ -1,9 +1,11 @@
+using FeedLabelPrint.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Seagull.BarTender.Print;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FeedLabelPrint.ViewModel
@@ -59,13 +61,15 @@ namespace FeedLabelPrint.ViewModel
 
         private void InitComponents()
         {
-            if (!Directory.Exists(Constants.btwTopDir))
-                Directory.CreateDirectory(Constants.btwTopDir);
+            if (!Directory.Exists(Constants.AppDataFeedLabelPrintDir))
+                Directory.CreateDirectory(Constants.AppDataFeedLabelPrintDir);
             this.ListBtwDirs();
-
-            //this.SelectedDate = DateTime.Today;
-
-            //SqliteHistory.CreateDb();
+            this.BatchNumber = "";
+            this.NeedDate = true;
+            this.SelectedDate = DateTime.Today;
+            this.PrintPages = 1;
+            this.StartingNumber = 1;
+            SqliteHistory.CreateDb();
             this.labelOperator = new LabelOperator(this.BtEngine);
 
         }
@@ -157,11 +161,66 @@ namespace FeedLabelPrint.ViewModel
                 {
                     this.selectedBtwFile = value;
                     this.RaisePropertyChanged(nameof(SelectedBtwFile));
+                    this.UpdatePrintedCount();
                     this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwFile))}";
 
                 }
             }
         }
+
+
+        private bool needDate;
+        public bool NeedDate
+        {
+            get
+            {
+                return this.needDate;
+            }
+            set
+            {
+                if (this.needDate != value)
+                {
+                    this.needDate = value;
+                    this.RaisePropertyChanged(nameof(NeedDate));
+                }
+            }
+        }
+
+        private DateTime selectedDate;
+        public DateTime SelectedDate
+        {
+            get
+            {
+                return this.selectedDate;
+            }
+            set
+            {
+                if (this.selectedDate != value)
+                {
+                    this.selectedDate = value;
+                    this.RaisePropertyChanged(nameof(SelectedDate));
+                }
+            }
+        }
+
+
+        //private string productType;
+        //public string ProductType
+        //{
+        //    get
+        //    {
+        //        return this.productType;
+        //    }
+        //    set
+        //    {
+        //        if (this.productType != value)
+        //        {
+        //            this.productType = value;
+        //            this.RaisePropertyChanged(nameof(ProductType));
+
+        //        }
+        //    }
+        //}
 
 
         private string batchNumber;
@@ -182,6 +241,24 @@ namespace FeedLabelPrint.ViewModel
         }
 
 
+        private int startingNumber;
+        public int StartingNumber
+        {
+            get
+            {
+                return this.startingNumber;
+            }
+            set
+            {
+                if (this.startingNumber != value)
+                {
+                    this.startingNumber = value;
+                    this.RaisePropertyChanged(nameof(StartingNumber));
+                }
+            }
+        }
+
+
         private int printPages;
         public int PrintPages
         {
@@ -195,6 +272,42 @@ namespace FeedLabelPrint.ViewModel
                 {
                     this.printPages = value;
                     this.RaisePropertyChanged(nameof(PrintPages));
+                }
+            }
+        }
+
+
+        private int printedCountOfCurrent;
+        public int PrintedCountOfCurrent
+        {
+            get
+            {
+                return this.printedCountOfCurrent;
+            }
+            set
+            {
+                if (this.printedCountOfCurrent != value)
+                {
+                    this.printedCountOfCurrent = value;
+                    this.RaisePropertyChanged(nameof(PrintedCountOfCurrent));
+                }
+            }
+        }
+
+
+        private int printedCountOfAll;
+        public int PrintedCountOfAll
+        {
+            get
+            {
+                return this.printedCountOfAll;
+            }
+            set
+            {
+                if (this.printedCountOfAll != value)
+                {
+                    this.printedCountOfAll = value;
+                    this.RaisePropertyChanged(nameof(PrintedCountOfAll));
                 }
             }
         }
@@ -244,14 +357,95 @@ namespace FeedLabelPrint.ViewModel
                     () => !isPrinting));
             }
         }
+
+
+        private LabelFormatDocument SetLabelValues(string file)
+        {
+            Log.Instance.Logger.Info($"开始设置标签字段值,文件{file}");
+            LabelFormatDocument label = this.labelOperator.OpenLabel(file);
+            string[] fieldsIn = this.labelOperator.GetLabelFields(file);
+            Log.Instance.Logger.Info($"标签包含的字段：{string.Join(",", fieldsIn)}");
+            this.Message = $"标签包含的字段：{string.Join(",", fieldsIn)}";
+            if (this.NeedDate && fieldsIn.Contains(Constants.FieldPrintDate))
+            {
+
+                label.SubStrings[Constants.FieldPrintDate].Value = this.SelectedDate.ToShortDateString();
+                Log.Instance.Logger.Info($"设置{Constants.FieldPrintDate}={this.SelectedDate.ToShortDateString()}");
+            }
+
+            if (fieldsIn.Contains(Constants.FieldProductType))
+            {
+                label.SubStrings[Constants.FieldProductType].Value = this.BatchNumber.Trim();
+                Log.Instance.Logger.Info($"设置{Constants.FieldProductType}={this.BatchNumber.Trim()}");
+            }
+
+
+            if (fieldsIn.Contains(Constants.FieldStartNumber))
+            {
+                label.SubStrings[Constants.FieldStartNumber].Value = this.BatchNumber.Trim();
+                Log.Instance.Logger.Info($"设置{Constants.FieldStartNumber}={this.BatchNumber.Trim()}");
+            }
+
+
+
+
+            Log.Instance.Logger.Info($"结束设置标签字段值,文件{file}");
+            return label;
+        }
+
+
+        private void UpdatePrintedCount()
+        {
+            if (LabelOperator.isObjectExistingFile(this.SelectedBtwFile))
+                this.PrintedCountOfCurrent = SqliteHistory.QueryTotalByLabel(this.SelectedBtwFile.Replace(
+                        Constants.btwTopDir, ""));
+            this.PrintedCountOfAll = SqliteHistory.QueryTotalAll();
+        }
+
         private async Task Print()
         {
+
             await Task.Run(() =>
             {
-                string msg = BtwPrintWrapper.PrintBtwFile(this.SelectedBtwFile, this.BtEngine);
-                this.Message = msg.Trim();
-            });
+                Log.Instance.Logger.Info($"触发打印!");
+                if (this.SelectedBtwFile == null)
+                {
+                    Log.Instance.Logger.Error($"未选择任何文件，退出打印!");
+                    return;
+                }
+                if (LabelOperator.isObjectExistingFile(this.SelectedBtwFile))
+                {
+                    if (this.BtEngine == null)
+                    {
+                        Log.Instance.Logger.Error($"bartender未正确初始化，无法打印!");
+                        return;
+                    }
+                    Log.Instance.Logger.Info($"准备打印{this.SelectedBtwFile}!");
 
+                    LabelFormatDocument label =
+                    this.SetLabelValues(this.SelectedBtwFile);
+                    if (this.SelectedBtwFile == null)
+                    {
+                        Log.Instance.Logger.Error($"未选择任何文件，退出打印!");
+                        return;
+                    }
+                    string BtwTemplate = this.SelectedBtwFile.Replace(
+                        Constants.btwTopDir, "");
+                    SqliteHistory.InsertPrintHistroy(BtwTemplate, this.PrintPages);
+                    this.UpdatePrintedCount();
+#if DEBUG
+                    this.Message = "DEBUG跳过真实打印";
+
+#else
+                    string msg = BtwPrintWrapper.PrintBtwFile(label, this.PrintPages, this.BtEngine);
+                    this.Message = msg.Trim();
+#endif
+                }
+                else
+                {
+                    Log.Instance.Logger.Error($"无法打印，文件不存在：{this.SelectedBtwFile}!");
+                }
+            });
         }
 
         #region IDisposable Support
