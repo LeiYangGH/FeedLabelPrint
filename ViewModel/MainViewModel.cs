@@ -74,24 +74,18 @@ namespace FeedLabelPrint.ViewModel
 
         }
 
-        private void CreateSampleData()
-        {
-            this.ObsBtwDirs = new ObservableCollection<string>() { "鸡饲料", "鱼饲料", "猪饲料" };
-            this.ObsBtwFiles = new ObservableCollection<string>() { "111", "222", "333", "444", "555", "666", "777", "888", "999" };
-        }
+
 
         private void ListBtwDirs()
         {
             string[] dirs = Directory.GetDirectories(Constants.btwTopDir);
             this.ObsBtwDirs = new ObservableCollection<string>(dirs);
-
         }
 
         private void ListBtwFilesInDir(string dir)
         {
             string[] files = Directory.GetFiles(dir, "*.btw");
-            this.ObsBtwFiles = new ObservableCollection<string>(files);
-
+            this.ObsBtwVMs = new ObservableCollection<BtwViewModel>(files.Select(f => new BtwViewModel(f)));
         }
 
         private ObservableCollection<string> obsBtwDirs;
@@ -130,39 +124,39 @@ namespace FeedLabelPrint.ViewModel
             }
         }
 
-        private ObservableCollection<string> obsBtwFiles;
-        public ObservableCollection<string> ObsBtwFiles
+        private ObservableCollection<BtwViewModel> obsBtwVMs;
+        public ObservableCollection<BtwViewModel> ObsBtwVMs
         {
             get
             {
-                return this.obsBtwFiles;
+                return this.obsBtwVMs;
             }
             set
             {
-                if (this.obsBtwFiles != value)
+                if (this.obsBtwVMs != value)
                 {
-                    this.obsBtwFiles = value;
-                    this.RaisePropertyChanged(nameof(ObsBtwFiles));
+                    this.obsBtwVMs = value;
+                    this.RaisePropertyChanged(nameof(ObsBtwVMs));
                 }
             }
         }
 
 
-        private string selectedBtwFile;
-        public string SelectedBtwFile
+        private BtwViewModel selectedBtwVM;
+        public BtwViewModel SelectedBtwVM
         {
             get
             {
-                return this.selectedBtwFile;
+                return this.selectedBtwVM;
             }
             set
             {
-                if (this.selectedBtwFile != value)
+                if (this.selectedBtwVM != value)
                 {
-                    this.selectedBtwFile = value;
-                    this.RaisePropertyChanged(nameof(SelectedBtwFile));
+                    this.selectedBtwVM = value;
+                    this.RaisePropertyChanged(nameof(SelectedBtwVM));
                     this.UpdatePrintedCount();
-                    this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwFile))}";
+                    this.Message = $"标签内字段：{string.Join(",", this.labelOperator.GetLabelFields(this.SelectedBtwVM.FullName))}";
 
                 }
             }
@@ -366,11 +360,13 @@ namespace FeedLabelPrint.ViewModel
             string[] fieldsIn = this.labelOperator.GetLabelFields(file);
             Log.Instance.Logger.Info($"标签包含的字段：{string.Join(",", fieldsIn)}");
             this.Message = $"标签包含的字段：{string.Join(",", fieldsIn)}";
-            if (this.NeedDate && fieldsIn.Contains(Constants.FieldPrintDate))
+            if (fieldsIn.Contains(Constants.FieldPrintDate))
             {
-
-                label.SubStrings[Constants.FieldPrintDate].Value = this.SelectedDate.ToShortDateString();
-                Log.Instance.Logger.Info($"设置{Constants.FieldPrintDate}={this.SelectedDate.ToShortDateString()}");
+                string dateValueString = "";
+                if (this.NeedDate)
+                    dateValueString = this.SelectedDate.ToShortDateString();
+                label.SubStrings[Constants.FieldPrintDate].Value = dateValueString;
+                Log.Instance.Logger.Info($"设置{Constants.FieldPrintDate}={dateValueString}");
             }
 
             if (fieldsIn.Contains(Constants.FieldProductType))
@@ -382,8 +378,8 @@ namespace FeedLabelPrint.ViewModel
 
             if (fieldsIn.Contains(Constants.FieldStartNumber))
             {
-                label.SubStrings[Constants.FieldStartNumber].Value = this.BatchNumber.Trim();
-                Log.Instance.Logger.Info($"设置{Constants.FieldStartNumber}={this.BatchNumber.Trim()}");
+                label.SubStrings[Constants.FieldStartNumber].Value = this.StartingNumber.ToString();
+                Log.Instance.Logger.Info($"设置{Constants.FieldStartNumber}={this.StartingNumber}");
             }
 
 
@@ -396,8 +392,8 @@ namespace FeedLabelPrint.ViewModel
 
         private void UpdatePrintedCount()
         {
-            if (LabelOperator.isObjectExistingFile(this.SelectedBtwFile))
-                this.PrintedCountOfCurrent = SqliteHistory.QueryTotalByLabel(this.SelectedBtwFile.Replace(
+            if (LabelOperator.isObjectExistingFile(this.SelectedBtwVM.FullName))
+                this.PrintedCountOfCurrent = SqliteHistory.QueryTotalByLabel(this.SelectedBtwVM.FullName.Replace(
                         Constants.btwTopDir, ""));
             this.PrintedCountOfAll = SqliteHistory.QueryTotalAll();
         }
@@ -408,28 +404,28 @@ namespace FeedLabelPrint.ViewModel
             await Task.Run(() =>
             {
                 Log.Instance.Logger.Info($"触发打印!");
-                if (this.SelectedBtwFile == null)
+                if (this.SelectedBtwVM == null)
                 {
                     Log.Instance.Logger.Error($"未选择任何文件，退出打印!");
                     return;
                 }
-                if (LabelOperator.isObjectExistingFile(this.SelectedBtwFile))
+                if (LabelOperator.isObjectExistingFile(this.SelectedBtwVM))
                 {
                     if (this.BtEngine == null)
                     {
                         Log.Instance.Logger.Error($"bartender未正确初始化，无法打印!");
                         return;
                     }
-                    Log.Instance.Logger.Info($"准备打印{this.SelectedBtwFile}!");
+                    Log.Instance.Logger.Info($"准备打印{this.SelectedBtwVM}!");
 
                     LabelFormatDocument label =
-                    this.SetLabelValues(this.SelectedBtwFile);
-                    if (this.SelectedBtwFile == null)
+                    this.SetLabelValues(this.SelectedBtwVM.FullName);
+                    if (this.SelectedBtwVM == null)
                     {
                         Log.Instance.Logger.Error($"未选择任何文件，退出打印!");
                         return;
                     }
-                    string BtwTemplate = this.SelectedBtwFile.Replace(
+                    string BtwTemplate = this.SelectedBtwVM.FullName.Replace(
                         Constants.btwTopDir, "");
                     SqliteHistory.InsertPrintHistroy(BtwTemplate, this.PrintPages);
                     this.UpdatePrintedCount();
@@ -443,7 +439,7 @@ namespace FeedLabelPrint.ViewModel
                 }
                 else
                 {
-                    Log.Instance.Logger.Error($"无法打印，文件不存在：{this.SelectedBtwFile}!");
+                    Log.Instance.Logger.Error($"无法打印，文件不存在：{this.SelectedBtwVM}!");
                 }
             });
         }

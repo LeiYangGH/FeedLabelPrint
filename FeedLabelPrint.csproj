@@ -92,6 +92,7 @@
     <Compile Include="LabelOperator.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Model\SqliteHistory.cs" />
+    <Compile Include="ViewModel\BtwViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="Views\DictionaryConverters.xaml">

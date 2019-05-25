@@ -102,24 +102,30 @@
                 </ListBox>
                 <GridSplitter Grid.Column="1" Width="4" VerticalAlignment="Stretch"  HorizontalAlignment="Center" ResizeDirection="Columns"/>
                 <ListBox  Grid.Column="2"
-                ItemsSource="{Binding ObsBtwFiles, Mode=OneWay}" 
-                     SelectedValue="{Binding SelectedBtwFile}">
+                ItemsSource="{Binding ObsBtwVMs, Mode=OneWay}" 
+                     SelectedItem="{Binding SelectedBtwVM}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition/>
+                                    <ColumnDefinition Width="auto"/>
                                 </Grid.ColumnDefinitions>
                                 <Image MaxWidth="50" MaxHeight="50" Margin="5,2">
                                     <Image.Source>
                                         <BitmapImage UriSource="/Images/bartend.ico" />
                                     </Image.Source>
                                 </Image>
-                                <TextBlock Text="{Binding ., Converter={StaticResource selbtwf2fnoextc},Mode=OneWay}" 
+                                <TextBlock Text="{Binding FileNameWithoutExt,Mode=OneWay}" 
                                            VerticalAlignment="Center"
                                            Grid.Column="1"/>
-
+                                <TextBlock  VerticalAlignment="Center" Grid.Column="2" Margin="5,2" >
+                 <Hyperlink Command="{Binding ExternalOpenCommand}">
+                               <TextBlock ToolTip="直接打开文件" VerticalAlignment="Center"
+                                Text="..."/>
+                 </Hyperlink>
+            </TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -128,7 +134,7 @@
                           Width="4" Background="LightGray" ResizeDirection="Columns"/>
 
                 <Image    Grid.Column="4"
-               Source="{Binding SelectedBtwFile, Converter={StaticResource btwf2ic},Mode=OneWay}"
+               Source="{Binding SelectedBtwVM.FullName, Converter={StaticResource btwf2ic},Mode=OneWay}"
                       />
 
             </Grid>
