@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,29 +18,70 @@ namespace FeedLabelPrint
         private Mutex mutex;
         protected override void OnStartup(StartupEventArgs e)
         {
+
+            //LicensingHelper.CreateLicense();
             bool isNewInstance = false;
+            bool valid = true;
             mutex = new Mutex(true, Constants.FeedLabelPrint, out isNewInstance);
             if (!isNewInstance)
             {
+                valid = false;
+
                 MessageBox.Show("不能同时运行多个程序实例！");
                 App.Current.Shutdown();
             }
-            else if (DateTime.Now > new DateTime(2019, 7, 1))
-            {
-                MessageBox.Show("试用期结束，请联系供应商！");
-                App.Current.Shutdown();
-            }
-            //else if (DateTime.Now >= new DateTime(2017, 10, 15))
-            //{
-            //    MessageBox.Show("试用期将于2017年10月31日结束！");
-            //}
-            else if (DateTime.Now < new DateTime(2019, 5, 25))
-            {
-                MessageBox.Show("您不能让时间倒流！");
-                App.Current.Shutdown();
-            }
             else
-                base.OnStartup(e);
+            {
+                string licenseFile = "License.xml";
+                if (!File.Exists(licenseFile))
+                {
+                    valid = false;
+
+                    MessageBox.Show("没找到注册信息，请联系供应商！");
+                    App.Current.Shutdown();
+                }
+                else
+                {
+
+                    var results_names = LicensingHelper.ValidateLicense(licenseFile)
+                        .Select(r => r.GetType().Name).ToArray();
+
+                    if (results_names.Any(r => r == "InvalidSignatureValidationFailure"))
+                    {
+                        valid = false;
+
+                        MessageBox.Show("不能自行更改注册信息，请联系供应商！");
+                        App.Current.Shutdown();
+                    }
+                    else if (results_names.Any(r => r == "InvalidMac"))
+                    {
+                        valid = false;
+
+                        MessageBox.Show("只能在指定电脑使用，请联系供应商！");
+                        App.Current.Shutdown();
+                    }
+                    else if (results_names.Any(r => r == "LicenseExpiredValidationFailure"))
+                    {
+                        valid = false;
+
+                        MessageBox.Show("试用期结束，请联系供应商！");
+                        App.Current.Shutdown();
+                    }
+
+                    else if (DateTime.Now < new DateTime(2019, 5, 26))
+                    {
+                        valid = false;
+
+                        MessageBox.Show("您不能让时间倒流！");
+                        App.Current.Shutdown();
+                    }
+                    else if (valid)
+                        base.OnStartup(e);
+                }
+
+
+            }
+
         }
 
         #region IDisposable Support
